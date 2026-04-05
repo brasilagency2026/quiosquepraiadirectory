@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Waves, Menu, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
+import Image from 'next/image'
 
 export default function Header() {
   const pathname = usePathname()
@@ -13,9 +14,9 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-cyan-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:border-slate-800 dark:bg-slate-900/95">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <Waves className="h-7 w-7 text-cyan-500" />
+          <Image src="/logo.jpg" alt="quiosquepraia.com" width={40} height={22} className="rounded" />
           <span className="text-lg font-bold text-slate-900 dark:text-white">
-            Quiosques de Praia
+            quiosquepraia.com
           </span>
         </Link>
 
