@@ -39,9 +39,17 @@ export default function Header() {
           </Link>
           <Link
             href="/login/proprietario"
-            className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-cyan-700"
+            className={`text-sm font-medium transition-colors hover:text-cyan-600 ${
+              pathname === '/login/proprietario' ? 'text-cyan-600' : 'text-slate-600 dark:text-slate-300'
+            }`}
           >
-            Área do Proprietário
+            Meu Quiosque
+          </Link>
+          <Link
+            href="/inscription"
+            className="rounded-lg bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:from-amber-500 hover:to-orange-600"
+          >
+            Cadastrar Quiosque
           </Link>
         </nav>
 
@@ -67,8 +75,11 @@ export default function Header() {
             <Link href="/suporte-contato" className="text-sm font-medium text-slate-700 dark:text-slate-300" onClick={() => setMenuOpen(false)}>
               Contato
             </Link>
-            <Link href="/login/proprietario" className="text-sm font-medium text-cyan-600" onClick={() => setMenuOpen(false)}>
-              Área do Proprietário
+            <Link href="/login/proprietario" className="text-sm font-medium text-slate-700 dark:text-slate-300" onClick={() => setMenuOpen(false)}>
+              Meu Quiosque
+            </Link>
+            <Link href="/inscription" className="text-sm font-semibold text-orange-500" onClick={() => setMenuOpen(false)}>
+              Cadastrar Quiosque
             </Link>
           </nav>
         </div>
