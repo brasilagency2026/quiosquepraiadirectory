@@ -1,8 +1,10 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
-import { Shield, Users, Store, Crown } from 'lucide-react'
+import { Shield, Users, Store, Crown, Clock } from 'lucide-react'
 import AdminQuiosqueList from './AdminQuiosqueList'
+import AdminPendingList from './AdminPendingList'
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient()
@@ -58,6 +60,17 @@ export default async function AdminDashboardPage() {
     owner_email: q.owner_id ? ownerMap.get(q.owner_id) : undefined,
   }))
 
+  // Fetch pending registrations (service role - no RLS)
+  const supabaseAdmin = createAdminClient()
+  const { data: pendingRegistrations } = await supabaseAdmin
+    .from('pending_registrations')
+    .select('id, email, whatsapp, created_at')
+    .eq('status', 'pending')
+    .eq('verified', true)
+    .order('created_at', { ascending: false })
+
+  const pendingCount = pendingRegistrations?.length || 0
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <div className="border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
@@ -68,13 +81,22 @@ export default async function AdminDashboardPage() {
       </div>
 
       <div className="mx-auto max-w-5xl px-4 py-8">
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-4">
+          <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-slate-800">
+            <div className="flex items-center gap-3">
+              <Clock className="h-8 w-8 text-amber-500" />
+              <div>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white">{pendingCount}</p>
+                <p className="text-sm text-slate-500">Pendentes</p>
+              </div>
+            </div>
+          </div>
           <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-slate-800">
             <div className="flex items-center gap-3">
               <Store className="h-8 w-8 text-cyan-500" />
               <div>
                 <p className="text-3xl font-bold text-slate-900 dark:text-white">{quiosquesCount || 0}</p>
-                <p className="text-sm text-slate-500">Quiosques cadastrados</p>
+                <p className="text-sm text-slate-500">Quiosques</p>
               </div>
             </div>
           </div>
@@ -83,7 +105,7 @@ export default async function AdminDashboardPage() {
               <Crown className="h-8 w-8 text-amber-500" />
               <div>
                 <p className="text-3xl font-bold text-slate-900 dark:text-white">{premiumCount || 0}</p>
-                <p className="text-sm text-slate-500">Quiosques Premium</p>
+                <p className="text-sm text-slate-500">Premium</p>
               </div>
             </div>
           </div>
@@ -92,10 +114,15 @@ export default async function AdminDashboardPage() {
               <Users className="h-8 w-8 text-cyan-500" />
               <div>
                 <p className="text-3xl font-bold text-slate-900 dark:text-white">{usersCount || 0}</p>
-                <p className="text-sm text-slate-500">Usuários registrados</p>
+                <p className="text-sm text-slate-500">Usuários</p>
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Pending Registrations */}
+        <div className="mt-8">
+          <AdminPendingList registrations={pendingRegistrations || []} />
         </div>
 
         <div className="mt-8">

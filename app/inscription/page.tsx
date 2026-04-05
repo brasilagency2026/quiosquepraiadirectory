@@ -1,58 +1,133 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
   MapPin, Camera, MessageCircle, UtensilsCrossed, Crown,
-  Check, X as XIcon, Eye, EyeOff, ExternalLink,
+  Check, X as XIcon, Eye, EyeOff, ExternalLink, Phone,
+  Mail, ShieldCheck, Clock, Loader2,
 } from 'lucide-react'
 
+type Step = 'plans' | 'form' | 'otp' | 'confirmed' | 'login'
+
 export default function InscriptionPage() {
-  const [step, setStep] = useState<'plans' | 'signup'>('plans')
+  const [step, setStep] = useState<Step>('plans')
   const [email, setEmail] = useState('')
+  const [whatsapp, setWhatsapp] = useState('')
+  const [otpCode, setOtpCode] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
-  const [isLogin, setIsLogin] = useState(false)
+  const [resendCooldown, setResendCooldown] = useState(0)
+  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const router = useRouter()
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const startCooldown = () => {
+    setResendCooldown(60)
+    if (cooldownRef.current) clearInterval(cooldownRef.current)
+    cooldownRef.current = setInterval(() => {
+      setResendCooldown(prev => {
+        if (prev <= 1) {
+          if (cooldownRef.current) clearInterval(cooldownRef.current)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+  }
+
+  const handleSendCode = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+
+    try {
+      const res = await fetch('/api/inscription/send-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, whatsapp }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Erro ao enviar código.')
+      } else {
+        setStep('otp')
+        startCooldown()
+      }
+    } catch {
+      setError('Erro de conexão.')
+    }
+    setLoading(false)
+  }
+
+  const handleResendCode = async () => {
+    if (resendCooldown > 0) return
+    setLoading(true)
+    setError('')
+
+    try {
+      const res = await fetch('/api/inscription/send-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, whatsapp }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Erro ao reenviar.')
+      } else {
+        setMessage('Novo código enviado!')
+        startCooldown()
+        setTimeout(() => setMessage(''), 3000)
+      }
+    } catch {
+      setError('Erro de conexão.')
+    }
+    setLoading(false)
+  }
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+
+    try {
+      const res = await fetch('/api/inscription/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code: otpCode }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Código inválido.')
+      } else {
+        setStep('confirmed')
+      }
+    } catch {
+      setError('Erro de conexão.')
+    }
+    setLoading(false)
+  }
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
     setMessage('')
 
     const supabase = createClient()
-
-    if (isLogin) {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) {
-        setError('Email ou senha inválidos.')
-        setLoading(false)
-        return
-      }
-      router.push('/owner/dashboard')
-      router.refresh()
-    } else {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      })
-      if (error) {
-        setError(error.message)
-      } else {
-        setMessage('Verifique seu email para confirmar o cadastro.')
-      }
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) {
+      setError('Email ou senha inválidos.')
+      setLoading(false)
+      return
     }
-    setLoading(false)
+    router.push('/owner/dashboard')
+    router.refresh()
   }
 
   return (
@@ -81,9 +156,9 @@ export default function InscriptionPage() {
           </p>
         </div>
 
-        {step === 'plans' ? (
+        {/* ==================== PLANS ==================== */}
+        {step === 'plans' && (
           <>
-            {/* Plans Grid */}
             <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
               {/* Free Plan */}
               <div className="relative flex flex-col rounded-2xl border-2 border-slate-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800">
@@ -126,7 +201,7 @@ export default function InscriptionPage() {
                   </li>
                   <li className="flex items-start gap-2.5 text-slate-400">
                     <XIcon className="mt-0.5 h-5 w-5 flex-shrink-0" />
-                    <span className="text-sm">Sem contato WhatsApp</span>
+                    <span className="text-sm">Sem contato WhatsApp visível na página</span>
                   </li>
                   <li className="flex items-start gap-2.5 text-slate-400">
                     <XIcon className="mt-0.5 h-5 w-5 flex-shrink-0" />
@@ -139,7 +214,7 @@ export default function InscriptionPage() {
                 </ul>
 
                 <button
-                  onClick={() => setStep('signup')}
+                  onClick={() => { setStep('form'); setError(''); setMessage('') }}
                   className="w-full rounded-xl border-2 border-cyan-600 py-3 text-sm font-semibold text-cyan-600 transition hover:bg-cyan-50 dark:hover:bg-cyan-900/20"
                 >
                   Cadastrar gratuitamente
@@ -241,15 +316,11 @@ export default function InscriptionPage() {
               </div>
             </div>
 
-            {/* Comparison note */}
             <div className="mx-auto mt-12 max-w-2xl text-center">
               <p className="text-sm text-slate-500">
                 Já tem conta?{' '}
                 <button
-                  onClick={() => {
-                    setIsLogin(true)
-                    setStep('signup')
-                  }}
+                  onClick={() => { setStep('login'); setError(''); setMessage('') }}
                   className="font-medium text-cyan-600 hover:underline"
                 >
                   Faça login aqui
@@ -257,22 +328,204 @@ export default function InscriptionPage() {
               </p>
             </div>
           </>
-        ) : (
-          /* Signup/Login Form */
+        )}
+
+        {/* ==================== FORM: Email + WhatsApp ==================== */}
+        {step === 'form' && (
+          <div className="mx-auto max-w-md">
+            <div className="rounded-2xl bg-white p-8 shadow-xl dark:bg-slate-800">
+              <div className="mb-6 text-center">
+                <Mail className="mx-auto mb-3 h-10 w-10 text-cyan-500" />
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                  Inscrição gratuita
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Informe seus dados. Enviaremos um código de verificação por email.
+                </p>
+              </div>
+
+              <form onSubmit={handleSendCode} className="space-y-4">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    placeholder="seu@email.com"
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    WhatsApp
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="tel"
+                      value={whatsapp}
+                      onChange={(e) => setWhatsapp(e.target.value)}
+                      required
+                      placeholder="+55 21 99999-9999"
+                      className="w-full rounded-lg border border-slate-300 py-2.5 pl-10 pr-3 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-slate-400">Número com DDD para contato</p>
+                </div>
+
+                {error && <p className="text-sm text-red-500">{error}</p>}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-600 py-2.5 text-sm font-medium text-white transition hover:bg-cyan-700 disabled:opacity-50"
+                >
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+                  {loading ? 'Enviando...' : 'Enviar código de verificação'}
+                </button>
+              </form>
+
+              <div className="mt-4 text-center">
+                <button
+                  onClick={() => { setStep('login'); setError('') }}
+                  className="text-sm text-cyan-600 hover:underline"
+                >
+                  Já tem conta? Entre aqui
+                </button>
+              </div>
+              <div className="mt-2 text-center">
+                <button
+                  onClick={() => { setStep('plans'); setError('') }}
+                  className="text-sm text-slate-400 hover:underline"
+                >
+                  ← Voltar aos planos
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== OTP Verification ==================== */}
+        {step === 'otp' && (
+          <div className="mx-auto max-w-md">
+            <div className="rounded-2xl bg-white p-8 shadow-xl dark:bg-slate-800">
+              <div className="mb-6 text-center">
+                <ShieldCheck className="mx-auto mb-3 h-10 w-10 text-green-500" />
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                  Verifique seu email
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Enviamos um código de 6 dígitos para{' '}
+                  <strong className="text-slate-700 dark:text-slate-300">{email}</strong>
+                </p>
+              </div>
+
+              <form onSubmit={handleVerifyCode} className="space-y-4">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Código de verificação
+                  </label>
+                  <input
+                    type="text"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    required
+                    maxLength={6}
+                    placeholder="000000"
+                    className="w-full rounded-lg border border-slate-300 px-3 py-3 text-center text-2xl font-bold tracking-[0.5em] dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                    autoFocus
+                  />
+                </div>
+
+                {error && <p className="text-sm text-red-500">{error}</p>}
+                {message && (
+                  <div className="rounded-lg bg-green-50 p-3 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">
+                    {message}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading || otpCode.length !== 6}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-600 py-2.5 text-sm font-medium text-white transition hover:bg-cyan-700 disabled:opacity-50"
+                >
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
+                  {loading ? 'Verificando...' : 'Verificar código'}
+                </button>
+              </form>
+
+              <div className="mt-4 text-center">
+                <button
+                  onClick={handleResendCode}
+                  disabled={resendCooldown > 0 || loading}
+                  className="text-sm text-cyan-600 hover:underline disabled:text-slate-400 disabled:no-underline"
+                >
+                  {resendCooldown > 0
+                    ? `Reenviar código em ${resendCooldown}s`
+                    : 'Reenviar código'}
+                </button>
+              </div>
+              <div className="mt-2 text-center">
+                <button
+                  onClick={() => { setStep('form'); setError(''); setOtpCode('') }}
+                  className="text-sm text-slate-400 hover:underline"
+                >
+                  ← Alterar email
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== CONFIRMED ==================== */}
+        {step === 'confirmed' && (
+          <div className="mx-auto max-w-md">
+            <div className="rounded-2xl bg-white p-8 text-center shadow-xl dark:bg-slate-800">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+                <Check className="h-8 w-8 text-green-600" />
+              </div>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                Inscrição recebida!
+              </h2>
+              <p className="mt-3 text-sm text-slate-500">
+                Sua solicitação de inscrição foi enviada com sucesso. Nossa equipe irá analisar seus dados e entrar em contato.
+              </p>
+              <div className="mt-6 rounded-lg bg-cyan-50 p-4 dark:bg-cyan-900/20">
+                <div className="flex items-center justify-center gap-2 text-sm font-medium text-cyan-700 dark:text-cyan-400">
+                  <Clock className="h-4 w-4" />
+                  Aguarde o email de aprovação
+                </div>
+                <p className="mt-1 text-xs text-cyan-600/70 dark:text-cyan-400/70">
+                  Você receberá um email com o link para criar sua senha e ativar sua conta.
+                </p>
+              </div>
+              <Link
+                href="/"
+                className="mt-6 inline-block text-sm text-cyan-600 hover:underline"
+              >
+                ← Voltar ao portal
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== LOGIN ==================== */}
+        {step === 'login' && (
           <div className="mx-auto max-w-md">
             <div className="rounded-2xl bg-white p-8 shadow-xl dark:bg-slate-800">
               <div className="mb-6 text-center">
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                  {isLogin ? 'Entrar na sua conta' : 'Criar sua conta'}
+                  Entrar na sua conta
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  {isLogin
-                    ? 'Entre para gerenciar seu quiosque'
-                    : 'Cadastre-se para adicionar seu quiosque ao portal'}
+                  Entre para gerenciar seu quiosque
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleLogin} className="space-y-4">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
                     Email
@@ -311,35 +564,25 @@ export default function InscriptionPage() {
                 </div>
 
                 {error && <p className="text-sm text-red-500">{error}</p>}
-                {message && (
-                  <div className="rounded-lg bg-green-50 p-3 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">
-                    {message}
-                  </div>
-                )}
 
                 <button
                   type="submit"
                   disabled={loading}
                   className="w-full rounded-lg bg-cyan-600 py-2.5 text-sm font-medium text-white transition hover:bg-cyan-700 disabled:opacity-50"
                 >
-                  {loading ? 'Carregando...' : isLogin ? 'Entrar' : 'Criar conta'}
+                  {loading ? 'Carregando...' : 'Entrar'}
                 </button>
               </form>
 
               <div className="mt-4 text-center">
                 <button
-                  onClick={() => {
-                    setIsLogin(!isLogin)
-                    setError('')
-                    setMessage('')
-                  }}
+                  onClick={() => { setStep('plans'); setError(''); setMessage('') }}
                   className="text-sm text-cyan-600 hover:underline"
                 >
-                  {isLogin ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Entre aqui'}
+                  Não tem conta? Cadastre-se
                 </button>
               </div>
-
-              <div className="mt-3 text-center">
+              <div className="mt-2 text-center">
                 <button
                   onClick={() => setStep('plans')}
                   className="text-sm text-slate-400 hover:underline"
