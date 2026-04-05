@@ -130,7 +130,7 @@ export default function InscriptionPage() {
                   </li>
                   <li className="flex items-start gap-2.5 text-slate-400">
                     <XIcon className="mt-0.5 h-5 w-5 flex-shrink-0" />
-                    <span className="text-sm">Sem menu digital</span>
+                    <span className="text-sm">Sem solução integrada (menu digital + pagamento)</span>
                   </li>
                   <li className="flex items-start gap-2.5 text-slate-400">
                     <XIcon className="mt-0.5 h-5 w-5 flex-shrink-0" />
@@ -164,7 +164,7 @@ export default function InscriptionPage() {
                     <span className="text-4xl font-extrabold text-slate-900 dark:text-white">Premium</span>
                   </div>
                   <p className="mt-2 text-sm text-slate-500">
-                    Destaque total com fotos, contato direto e menu digital.
+                    Destaque total com fotos, contato direto e solução integrada.
                   </p>
                 </div>
 
@@ -193,7 +193,15 @@ export default function InscriptionPage() {
                     <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-500" />
                     <span className="text-sm text-slate-700 dark:text-slate-300">
                       <UtensilsCrossed className="mr-1 inline h-4 w-4 text-orange-500" />
-                      <strong>Menu digital</strong> integrado
+                      <strong>Solução integrada</strong> : menu digital via QR code no guarda-sol + pagamento via{' '}
+                      <a
+                        href="https://pay.quiosquepraia.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold text-cyan-600 underline hover:text-cyan-700"
+                      >
+                        pay.quiosquepraia.com
+                      </a>
                     </span>
                   </li>
                   <li className="flex items-start gap-2.5">
