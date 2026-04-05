@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Portal Quiosques de Praia",
     description: "Encontre os melhores quiosques de praia do Brasil",
-    url: "https://portalquiosques.vercel.app",
+    url: "https://quiosquepraia.com",
     siteName: "Quiosques de Praia",
     locale: "pt_BR",
     type: "website",

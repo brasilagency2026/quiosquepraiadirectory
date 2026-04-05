@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/owner/', '/admin/', '/api/'],
     },
-    sitemap: 'https://portalquiosques.vercel.app/sitemap.xml',
+    sitemap: 'https://quiosquepraia.com/sitemap.xml',
   }
 }

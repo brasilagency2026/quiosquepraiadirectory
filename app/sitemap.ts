@@ -4,7 +4,7 @@ import { buildQuiosquePath } from '@/lib/utils'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient()
-  const baseUrl = 'https://portalquiosques.vercel.app'
+  const baseUrl = 'https://quiosquepraia.com'
 
   const { data: quiosques } = await supabase
     .from('quiosques')
