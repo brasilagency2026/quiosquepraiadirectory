@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
-  Waves, Edit, ExternalLink, Eye, Crown, LogOut, MapPin, Star,
+  Waves, Eye, Crown, LogOut, MapPin, Star,
 } from 'lucide-react'
 import PremiumBadge from '@/components/PremiumBadge'
 import { buildQuiosquePath, getProxyImageUrl } from '@/lib/utils'
@@ -34,7 +34,7 @@ export default function DashboardClient({ quiosque, userEmail, isPremium }: Prop
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <Waves className="h-6 w-6 text-cyan-500" />
-            <span className="font-semibold text-slate-900 dark:text-white">Painel do Proprietário</span>
+            <span className="font-semibold text-slate-900 dark:text-white">Meu Quiosque</span>
           </div>
           <div className="flex items-center gap-4">
             <span className="hidden text-sm text-slate-500 md:block">{userEmail}</span>
@@ -68,7 +68,6 @@ export default function DashboardClient({ quiosque, userEmail, isPremium }: Prop
                   rel="noopener noreferrer"
                   className="mt-4 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-orange-600 transition hover:bg-orange-50"
                 >
-                  <ExternalLink className="h-4 w-4" />
                   Assinar Premium em pay.quiosquepraia.com
                 </a>
               </div>
@@ -132,14 +131,7 @@ export default function DashboardClient({ quiosque, userEmail, isPremium }: Prop
               </div>
 
               {/* Actions */}
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link
-                  href={`/owner/edit-quiosque/${quiosque.id}`}
-                  className="inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-cyan-700"
-                >
-                  <Edit className="h-4 w-4" />
-                  Editar
-                </Link>
+              <div className="mt-6">
                 <Link
                   href={publicUrl}
                   className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300"
@@ -151,36 +143,6 @@ export default function DashboardClient({ quiosque, userEmail, isPremium }: Prop
             </div>
           </div>
         </div>
-
-        {/* Stats for premium */}
-        {isPremium && (
-          <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-            <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-slate-800">
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                {quiosque.photos?.length || 0}
-              </p>
-              <p className="text-sm text-slate-500">Fotos</p>
-            </div>
-            <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-slate-800">
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                {quiosque.services?.length || 0}
-              </p>
-              <p className="text-sm text-slate-500">Serviços</p>
-            </div>
-            <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-slate-800">
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                {quiosque.specialties?.length || 0}
-              </p>
-              <p className="text-sm text-slate-500">Especialidades</p>
-            </div>
-            <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-slate-800">
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                {quiosque.google_reviews_count || 0}
-              </p>
-              <p className="text-sm text-slate-500">Avaliações Google</p>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )

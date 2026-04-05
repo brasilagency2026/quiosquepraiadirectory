@@ -1,17 +1,14 @@
+import { createClient } from '@/lib/supabase/server'
+
 export async function checkPremiumStatus(email: string): Promise<boolean> {
   try {
-    const res = await fetch(
-      `${process.env.PREMIUM_API_URL}?email=${encodeURIComponent(email)}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${process.env.PREMIUM_API_SECRET}`,
-        },
-        next: { revalidate: 3600 },
-      }
-    )
-    if (!res.ok) return false
-    const data = await res.json()
-    return data.active === true
+    const supabase = await createClient()
+    const { data } = await supabase
+      .from('users')
+      .select('is_premium')
+      .eq('email', email)
+      .single()
+    return data?.is_premium === true
   } catch {
     return false
   }

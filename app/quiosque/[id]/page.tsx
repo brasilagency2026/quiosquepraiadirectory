@@ -259,8 +259,7 @@ export default async function QuiosquePage({
                   rel="noopener noreferrer"
                   className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-cyan-600 hover:underline"
                 >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  É o seu quiosque? Ative o Premium em pay.quiosquepraia.com
+                  É o seu quiosque? Assine o Premium em pay.quiosquepraia.com
                 </a>
               </div>
             </div>
