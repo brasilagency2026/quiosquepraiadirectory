@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,7 +11,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    const { data: profile } = await supabase
+    const adminSupabase = createAdminClient()
+
+    const { data: profile } = await adminSupabase
       .from('users')
       .select('role')
       .eq('id', user.id)
@@ -27,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update quiosque plan
-    const { error: quiosqueError } = await supabase
+    const { error: quiosqueError } = await adminSupabase
       .from('quiosques')
       .update({
         plan: premium ? 'premium' : 'free',
@@ -39,18 +42,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Erro ao atualizar quiosque' }, { status: 500 })
     }
 
-    // Update owner's is_premium flag
-    const { data: owner } = await supabase
-      .from('users')
-      .select('id')
-      .eq('quiosque_id', quiosqueId)
+    // Update owner's is_premium flag — find owner via quiosque.owner_id
+    const { data: quiosque } = await adminSupabase
+      .from('quiosques')
+      .select('owner_id')
+      .eq('id', quiosqueId)
       .single()
 
-    if (owner) {
-      await supabase
+    if (quiosque?.owner_id) {
+      await adminSupabase
         .from('users')
         .update({ is_premium: premium })
-        .eq('id', owner.id)
+        .eq('id', quiosque.owner_id)
     }
 
     return NextResponse.json({ success: true, premium })
