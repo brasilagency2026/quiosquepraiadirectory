@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
-  Waves, Eye, Crown, LogOut, MapPin, Star,
+  Waves, Eye, Crown, LogOut, MapPin, Star, Pencil,
 } from 'lucide-react'
 import PremiumBadge from '@/components/PremiumBadge'
 import { buildQuiosquePath, getProxyImageUrl } from '@/lib/utils'
@@ -131,7 +131,14 @@ export default function DashboardClient({ quiosque, userEmail, isPremium }: Prop
               </div>
 
               {/* Actions */}
-              <div className="mt-6">
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link
+                  href={`/owner/edit-quiosque/${quiosque.id}`}
+                  className="inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-cyan-700"
+                >
+                  <Pencil className="h-4 w-4" />
+                  Editar quiosque
+                </Link>
                 <Link
                   href={publicUrl}
                   className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300"
