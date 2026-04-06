@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-import { Search, MapPin, Filter, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import { Search, MapPin, Filter, ChevronLeft, ChevronRight, Navigation, Loader2 } from 'lucide-react'
 import QuiosqueCard from './QuiosqueCard'
 import QuiosqueMapDynamic from './QuiosqueMapDynamic'
 import { useIsMobile } from '@/hooks/use-mobile'
@@ -20,6 +20,7 @@ export default function HomeContent({ quiosques }: HomeContentProps) {
   const [stateFilter, setStateFilter] = useState('')
   const [page, setPage] = useState(1)
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
+  const [geoLoading, setGeoLoading] = useState(false)
   const [showMap, setShowMap] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
 
@@ -27,15 +28,34 @@ export default function HomeContent({ quiosques }: HomeContentProps) {
     setPage(1)
   }, [search, stateFilter, isMobile])
 
-  const handleGeolocate = () => {
+  // Auto-geolocate on page load
+  useEffect(() => {
     if (!navigator.geolocation) return
+    setGeoLoading(true)
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        setShowMap(true)
+        setGeoLoading(false)
       },
-      () => {}
+      () => { setGeoLoading(false) },
+      { timeout: 10000, maximumAge: 300000 }
     )
-  }
+  }, [])
+
+  const handleGeolocate = useCallback(() => {
+    if (!navigator.geolocation) return
+    setGeoLoading(true)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        setShowMap(true)
+        setGeoLoading(false)
+      },
+      () => { setGeoLoading(false) },
+      { timeout: 10000 }
+    )
+  }, [])
 
   const filtered = useMemo(() => {
     let list = [...quiosques]
@@ -102,10 +122,21 @@ export default function HomeContent({ quiosques }: HomeContentProps) {
           </div>
           <button
             onClick={handleGeolocate}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-medium text-cyan-700 shadow-lg transition hover:bg-cyan-50 dark:bg-slate-800 dark:text-cyan-400"
+            disabled={geoLoading}
+            className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium shadow-lg transition ${
+              userLocation
+                ? 'bg-cyan-600 text-white hover:bg-cyan-700 dark:bg-cyan-700'
+                : 'bg-white text-cyan-700 hover:bg-cyan-50 dark:bg-slate-800 dark:text-cyan-400'
+            } disabled:opacity-60`}
           >
-            <MapPin className="h-4 w-4" />
-            Perto de mim
+            {geoLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : userLocation ? (
+              <Navigation className="h-4 w-4" />
+            ) : (
+              <MapPin className="h-4 w-4" />
+            )}
+            {geoLoading ? 'Localizando...' : userLocation ? 'Localizado' : 'Perto de mim'}
           </button>
         </div>
       </section>
@@ -124,6 +155,7 @@ export default function HomeContent({ quiosques }: HomeContentProps) {
             </button>
             <span className="text-sm text-slate-500">
               {filtered.length} quiosque{filtered.length !== 1 ? 's' : ''} encontrado{filtered.length !== 1 ? 's' : ''}
+              {userLocation && ' • ordenados por distância'}
             </span>
           </div>
           <button

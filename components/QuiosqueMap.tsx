@@ -1,9 +1,9 @@
 'use client'
 
-import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, Circle, CircleMarker } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { getProxyImageUrl, buildQuiosquePath } from '@/lib/utils'
+import { getProxyImageUrl, buildQuiosquePath, calculateDistance } from '@/lib/utils'
 import type { Quiosque } from '@/types'
 import Link from 'next/link'
 
@@ -62,17 +62,29 @@ export default function QuiosqueMap({
       />
 
       {userLocation && (
-        <Circle
-          center={[userLocation.lat, userLocation.lng]}
-          radius={20000}
-          pathOptions={{ color: '#06B6D4', fillColor: '#06B6D4', fillOpacity: 0.1 }}
-        />
+        <>
+          <CircleMarker
+            center={[userLocation.lat, userLocation.lng]}
+            radius={10}
+            pathOptions={{ color: '#fff', fillColor: '#3B82F6', fillOpacity: 1, weight: 3 }}
+          >
+            <Popup>
+              <p className="text-sm font-semibold text-blue-600">📍 Sua localização</p>
+            </Popup>
+          </CircleMarker>
+          <Circle
+            center={[userLocation.lat, userLocation.lng]}
+            radius={20000}
+            pathOptions={{ color: '#06B6D4', fillColor: '#06B6D4', fillOpacity: 0.08, weight: 1 }}
+          />
+        </>
       )}
 
       {quiosques.map((q) => {
         if (!q.lat || !q.lng) return null
         const isPremium = q.plan === 'premium'
         const href = buildQuiosquePath(q.name, q.id, q.state, q.city, q.beach_name)
+        const dist = userLocation ? calculateDistance(userLocation.lat, userLocation.lng, q.lat, q.lng) : null
 
         return (
           <Marker
@@ -98,6 +110,11 @@ export default function QuiosqueMap({
                 <p className="text-xs text-slate-500">
                   {q.city}, {q.state}
                 </p>
+                {dist != null && (
+                  <p className="mt-1 text-xs font-medium text-cyan-600">
+                    📍 {dist < 1 ? `${Math.round(dist * 1000)}m` : `${dist.toFixed(1)}km`}
+                  </p>
+                )}
               </div>
             </Popup>
           </Marker>
