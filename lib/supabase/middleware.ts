@@ -31,7 +31,7 @@ export async function updateSession(request: NextRequest) {
 
   if (!user && (pathname.startsWith('/owner') || pathname.startsWith('/admin'))) {
     const url = request.nextUrl.clone()
-    url.pathname = '/login/proprietario'
+    url.pathname = pathname.startsWith('/admin') ? '/login/admin' : '/login/proprietario'
     return NextResponse.redirect(url)
   }
 

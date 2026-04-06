@@ -14,7 +14,10 @@ export default async function AdminDashboardPage() {
     redirect('/login/admin')
   }
 
-  const { data: profile } = await supabase
+  // Use admin client (service role) to bypass RLS for all admin queries
+  const supabaseAdmin = createAdminClient()
+
+  const { data: profile } = await supabaseAdmin
     .from('users')
     .select('role')
     .eq('id', user.id)
@@ -24,21 +27,21 @@ export default async function AdminDashboardPage() {
     redirect('/')
   }
 
-  const { count: quiosquesCount } = await supabase
+  const { count: quiosquesCount } = await supabaseAdmin
     .from('quiosques')
     .select('*', { count: 'exact', head: true })
 
-  const { count: usersCount } = await supabase
+  const { count: usersCount } = await supabaseAdmin
     .from('users')
     .select('*', { count: 'exact', head: true })
 
-  const { count: premiumCount } = await supabase
+  const { count: premiumCount } = await supabaseAdmin
     .from('quiosques')
     .select('*', { count: 'exact', head: true })
     .eq('plan', 'premium')
 
   // Fetch all quiosques with owner email
-  const { data: quiosques } = await supabase
+  const { data: quiosques } = await supabaseAdmin
     .from('quiosques')
     .select('id, name, city, state, plan, owner_id')
     .order('created_at', { ascending: false })
@@ -46,7 +49,7 @@ export default async function AdminDashboardPage() {
   // Fetch owner emails
   const ownerIds = [...new Set((quiosques || []).map(q => q.owner_id).filter(Boolean))]
   const { data: owners } = ownerIds.length > 0
-    ? await supabase.from('users').select('id, email').in('id', ownerIds)
+    ? await supabaseAdmin.from('users').select('id, email').in('id', ownerIds)
     : { data: [] }
 
   const ownerMap = new Map((owners || []).map(o => [o.id, o.email]))
@@ -60,8 +63,7 @@ export default async function AdminDashboardPage() {
     owner_email: q.owner_id ? ownerMap.get(q.owner_id) : undefined,
   }))
 
-  // Fetch pending registrations (service role - no RLS)
-  const supabaseAdmin = createAdminClient()
+  // Fetch pending registrations
   const { data: pendingRegistrations } = await supabaseAdmin
     .from('pending_registrations')
     .select('id, email, whatsapp, created_at')
