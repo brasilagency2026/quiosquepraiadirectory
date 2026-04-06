@@ -15,14 +15,19 @@ export async function sendEmail({
         'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: process.env.RESEND_FROM_EMAIL || 'no-reply@portalquiosques.com.br',
+        from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
         to,
         subject,
         html,
       }),
     })
+    if (!res.ok) {
+      const body = await res.text()
+      console.error('Resend error:', res.status, body)
+    }
     return res.ok
-  } catch {
+  } catch (err) {
+    console.error('Resend exception:', err)
     return false
   }
 }

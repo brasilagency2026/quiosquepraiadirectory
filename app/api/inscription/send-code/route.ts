@@ -12,10 +12,14 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient()
 
-    // Check if email already has a Supabase auth account
-    const { data: existingUsers } = await supabase.auth.admin.listUsers()
-    const existingUser = existingUsers?.users?.find(u => u.email === email)
-    if (existingUser) {
+    // Check if email already has a Supabase auth account (lightweight check)
+    const { data: existingProfile } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .maybeSingle()
+
+    if (existingProfile) {
       return NextResponse.json(
         { error: 'Este email já possui uma conta. Faça login.' },
         { status: 409 }
@@ -23,11 +27,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if already approved
-    const { data: existing } = await supabase
+    const { data: existing, error: existingError } = await supabase
       .from('pending_registrations')
       .select('status, code_sent_at')
       .eq('email', email)
-      .single()
+      .maybeSingle()
+
+    // If table doesn't exist yet, log but continue
+    if (existingError) {
+      console.error('DB query error (pending_registrations may not exist):', existingError)
+      return NextResponse.json(
+        { error: 'Tabela pending_registrations não encontrada. Execute o SQL no Supabase.' },
+        { status: 500 }
+      )
+    }
 
     if (existing?.status === 'approved') {
       return NextResponse.json(
