@@ -46,6 +46,33 @@ export async function POST(request: NextRequest) {
       console.error('Profile creation error:', profileError)
     }
 
+    // Create the quiosque if name/beach info was provided during inscription
+    if (registration.quiosque_name) {
+      const { data: quiosque, error: quiosqueError } = await supabase
+        .from('quiosques')
+        .insert({
+          owner_id: authData.user.id,
+          name: registration.quiosque_name,
+          beach_name: registration.beach_name || '',
+          city: registration.city || '',
+          state: registration.state || '',
+          plan: 'free',
+          status: 'active',
+        })
+        .select('id')
+        .single()
+
+      if (quiosqueError) {
+        console.error('Quiosque creation error:', quiosqueError)
+      } else if (quiosque) {
+        // Link quiosque to user profile
+        await supabase
+          .from('users')
+          .update({ quiosque_id: quiosque.id })
+          .eq('id', authData.user.id)
+      }
+    }
+
     // Mark registration as completed (update status so token can't be reused)
     await supabase
       .from('pending_registrations')

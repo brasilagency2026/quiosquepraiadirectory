@@ -8,11 +8,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const { data: quiosques } = await supabase
     .from('quiosques')
-    .select('id, name, created_at')
+    .select('id, name, state, city, beach_name, created_at')
     .eq('status', 'active')
 
   const quiosqueUrls: MetadataRoute.Sitemap = (quiosques || []).map((q) => ({
-    url: `${baseUrl}${buildQuiosquePath(q.name, q.id)}`,
+    url: `${baseUrl}${buildQuiosquePath(q.name, q.id, q.state, q.city, q.beach_name)}`,
     lastModified: q.created_at,
     changeFrequency: 'weekly' as const,
     priority: 0.8,

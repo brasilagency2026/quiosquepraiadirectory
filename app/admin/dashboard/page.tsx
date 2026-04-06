@@ -71,7 +71,7 @@ export default async function AdminDashboardPage() {
   // Fetch pending registrations
   const { data: pendingRegistrations } = await supabaseAdmin
     .from('pending_registrations')
-    .select('id, email, whatsapp, created_at')
+    .select('id, email, whatsapp, quiosque_name, beach_name, city, state, created_at')
     .eq('status', 'pending')
     .eq('verified', true)
     .order('created_at', { ascending: false })

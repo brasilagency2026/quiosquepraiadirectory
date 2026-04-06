@@ -20,13 +20,23 @@ export function slugify(text: string): string {
     .replace(/(^-|-$)/g, '')
 }
 
-export function buildQuiosquePath(name: string, id: string): string {
-  const slug = slugify(name)
+export function buildQuiosquePath(name: string, id: string, state?: string, city?: string, beachName?: string): string {
   const shortId = id.slice(0, 8)
-  return `/quiosque/${slug}-${shortId}`
+  const slugName = slugify(name)
+  
+  if (state && city) {
+    const slugState = slugify(state.replace(/\s*\([A-Z]{2}\)\s*$/, ''))
+    const slugCity = slugify(city)
+    const slugBeach = beachName ? slugify(beachName) : 'praia'
+    return `/quiosque/${slugState}/${slugCity}/${slugBeach}/${slugName}-${shortId}`
+  }
+  
+  // Fallback for quiosques without state/city
+  return `/quiosque/${slugName}-${shortId}`
 }
 
 export function extractIdFromSlug(slug: string): string {
+  // slug can be "nome-do-quiosque-a1b2c3d4" — last segment after last dash
   const parts = slug.split('-')
   const shortId = parts[parts.length - 1]
   return shortId

@@ -72,7 +72,7 @@ export default function QuiosqueMap({
       {quiosques.map((q) => {
         if (!q.lat || !q.lng) return null
         const isPremium = q.plan === 'premium'
-        const href = buildQuiosquePath(q.name, q.id)
+        const href = buildQuiosquePath(q.name, q.id, q.state, q.city, q.beach_name)
 
         return (
           <Marker

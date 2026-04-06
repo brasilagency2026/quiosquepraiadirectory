@@ -4,10 +4,14 @@ import { sendEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, whatsapp } = await request.json()
+    const { email, whatsapp, quiosque_name, beach_name, city, state } = await request.json()
 
     if (!email || !whatsapp) {
       return NextResponse.json({ error: 'Email e WhatsApp são obrigatórios.' }, { status: 400 })
+    }
+
+    if (!quiosque_name || !beach_name || !city || !state) {
+      return NextResponse.json({ error: 'Nome do quiosque, praia, cidade e estado são obrigatórios.' }, { status: 400 })
     }
 
     const supabase = createAdminClient()
@@ -70,6 +74,10 @@ export async function POST(request: NextRequest) {
         {
           email,
           whatsapp,
+          quiosque_name,
+          beach_name,
+          city,
+          state,
           verification_code: code,
           code_sent_at: new Date().toISOString(),
           verified: false,

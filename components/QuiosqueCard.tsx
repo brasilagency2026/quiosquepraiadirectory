@@ -14,7 +14,7 @@ interface QuiosqueCardProps {
 
 export default function QuiosqueCard({ quiosque, distance }: QuiosqueCardProps) {
   const isPremium = quiosque.plan === 'premium'
-  const href = buildQuiosquePath(quiosque.name, quiosque.id)
+  const href = buildQuiosquePath(quiosque.name, quiosque.id, quiosque.state, quiosque.city, quiosque.beach_name)
 
   if (!isPremium) {
     return (

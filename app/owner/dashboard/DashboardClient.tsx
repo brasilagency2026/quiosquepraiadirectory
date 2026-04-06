@@ -18,7 +18,7 @@ interface Props {
 
 export default function DashboardClient({ quiosque, userEmail, isPremium }: Props) {
   const router = useRouter()
-  const publicUrl = buildQuiosquePath(quiosque.name, quiosque.id)
+  const publicUrl = buildQuiosquePath(quiosque.name, quiosque.id, quiosque.state, quiosque.city, quiosque.beach_name)
   const imageUrl = quiosque.photos?.[0] ? getProxyImageUrl(quiosque.photos[0]) : null
 
   const handleSignOut = async () => {

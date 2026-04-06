@@ -8,8 +8,9 @@ import Image from 'next/image'
 import {
   MapPin, Camera, MessageCircle, UtensilsCrossed, Crown,
   Check, X as XIcon, Eye, EyeOff, ExternalLink, Phone,
-  Mail, ShieldCheck, Clock, Loader2,
+  Mail, ShieldCheck, Clock, Loader2, Store,
 } from 'lucide-react'
+import { ESTADOS_BRASIL } from '@/types'
 
 type Step = 'plans' | 'form' | 'otp' | 'confirmed' | 'login'
 
@@ -17,6 +18,10 @@ export default function InscriptionPage() {
   const [step, setStep] = useState<Step>('plans')
   const [email, setEmail] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
+  const [quiosqueName, setQuiosqueName] = useState('')
+  const [beachName, setBeachName] = useState('')
+  const [city, setCity] = useState('')
+  const [state, setState] = useState('')
   const [otpCode, setOtpCode] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -50,7 +55,7 @@ export default function InscriptionPage() {
       const res = await fetch('/api/inscription/send-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, whatsapp }),
+        body: JSON.stringify({ email, whatsapp, quiosque_name: quiosqueName, beach_name: beachName, city, state }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -74,7 +79,7 @@ export default function InscriptionPage() {
       const res = await fetch('/api/inscription/send-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, whatsapp }),
+        body: JSON.stringify({ email, whatsapp, quiosque_name: quiosqueName, beach_name: beachName, city, state }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -345,6 +350,67 @@ export default function InscriptionPage() {
               </div>
 
               <form onSubmit={handleSendCode} className="space-y-4">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Nome do quiosque
+                  </label>
+                  <div className="relative">
+                    <Store className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      value={quiosqueName}
+                      onChange={(e) => setQuiosqueName(e.target.value)}
+                      required
+                      placeholder="Ex: Quiosque do Zé"
+                      className="w-full rounded-lg border border-slate-300 py-2.5 pl-10 pr-3 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Nome da praia
+                  </label>
+                  <input
+                    type="text"
+                    value={beachName}
+                    onChange={(e) => setBeachName(e.target.value)}
+                    required
+                    placeholder="Ex: Praia de Copacabana"
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Estado
+                    </label>
+                    <select
+                      value={state}
+                      onChange={(e) => setState(e.target.value)}
+                      required
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                    >
+                      <option value="">Selecione...</option>
+                      {ESTADOS_BRASIL.map((e) => (
+                        <option key={e} value={e}>{e}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Cidade
+                    </label>
+                    <input
+                      type="text"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      required
+                      placeholder="Ex: Rio de Janeiro"
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                    />
+                  </div>
+                </div>
+                <hr className="border-slate-200 dark:border-slate-700" />
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
                     Email

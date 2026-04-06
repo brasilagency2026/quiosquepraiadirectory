@@ -7,6 +7,10 @@ interface PendingRegistration {
   id: string
   email: string
   whatsapp: string
+  quiosque_name?: string
+  beach_name?: string
+  city?: string
+  state?: string
   created_at: string
 }
 
@@ -72,6 +76,12 @@ export default function AdminPendingList({ registrations: initial }: { registrat
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-slate-900 dark:text-white">{r.email}</p>
+                {r.quiosque_name && (
+                  <p className="mt-0.5 text-sm font-medium text-cyan-600 dark:text-cyan-400">
+                    🏖️ {r.quiosque_name}{r.beach_name ? ` — ${r.beach_name}` : ''}
+                    {r.city && r.state ? ` (${r.city}, ${r.state})` : ''}
+                  </p>
+                )}
                 <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-slate-500">
                   <span className="flex items-center gap-1">
                     <MessageCircle className="h-3.5 w-3.5 text-green-500" />
