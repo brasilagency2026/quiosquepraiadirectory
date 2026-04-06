@@ -28,8 +28,8 @@ export default function AdminLoginPage() {
       return
     }
 
-    router.push('/admin/dashboard')
-    router.refresh()
+    // Full page reload to ensure auth cookies are sent to the server
+    window.location.href = '/admin/dashboard'
   }
 
   return (

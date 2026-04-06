@@ -8,7 +8,9 @@ import AdminPendingList from './AdminPendingList'
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+  console.log('[ADMIN DASHBOARD] auth getUser:', user?.id, user?.email, 'error:', authError?.message)
 
   if (!user) {
     redirect('/login/admin')
@@ -17,13 +19,16 @@ export default async function AdminDashboardPage() {
   // Use admin client (service role) to bypass RLS for all admin queries
   const supabaseAdmin = createAdminClient()
 
-  const { data: profile } = await supabaseAdmin
+  const { data: profile, error: profileError } = await supabaseAdmin
     .from('users')
     .select('role')
     .eq('id', user.id)
     .single()
 
+  console.log('[ADMIN DASHBOARD] profile query:', JSON.stringify(profile), 'error:', profileError?.message)
+
   if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    console.log('[ADMIN DASHBOARD] REDIRECTING TO / — role check failed. profile:', JSON.stringify(profile))
     redirect('/')
   }
 
