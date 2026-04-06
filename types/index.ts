@@ -1,3 +1,12 @@
+export type GoogleReview = {
+  author_name: string;
+  rating: number;
+  text: string;
+  time: number;
+  photo_url: string | null;
+  relative_time: string | null;
+};
+
 export type Quiosque = {
   id: string;
   owner_id: string;
@@ -22,6 +31,7 @@ export type Quiosque = {
   google_place_id: string;
   google_rating: number | null;
   google_reviews_count: number;
+  google_reviews: GoogleReview[];
   premium_verified_at: string | null;
   created_at: string;
 };

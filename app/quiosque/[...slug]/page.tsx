@@ -252,6 +252,78 @@ export default async function QuiosquePage({
               </div>
             )}
 
+            {/* Google Reviews */}
+            {quiosque.google_reviews && quiosque.google_reviews.length > 0 && (
+              <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-slate-800">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                    Avaliações do Google
+                  </h2>
+                  {quiosque.google_rating && (
+                    <div className="flex items-center gap-1.5">
+                      <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
+                      <span className="font-bold text-slate-800 dark:text-white">
+                        {quiosque.google_rating.toFixed(1)}
+                      </span>
+                      <span className="text-sm text-slate-500">
+                        ({quiosque.google_reviews_count})
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-4">
+                  {quiosque.google_reviews.map((review, i) => (
+                    <div
+                      key={i}
+                      className="border-t border-slate-100 pt-4 first:border-0 first:pt-0 dark:border-slate-700"
+                    >
+                      <div className="flex items-center gap-3">
+                        {review.photo_url ? (
+                          <img
+                            src={review.photo_url}
+                            alt={review.author_name}
+                            className="h-8 w-8 rounded-full object-cover"
+                            referrerPolicy="no-referrer"
+                          />
+                        ) : (
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-100 text-sm font-bold text-cyan-700 dark:bg-cyan-900 dark:text-cyan-300">
+                            {review.author_name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-sm font-medium text-slate-800 dark:text-white">
+                            {review.author_name}
+                          </p>
+                          <div className="flex items-center gap-1">
+                            {Array.from({ length: 5 }).map((_, s) => (
+                              <Star
+                                key={s}
+                                className={`h-3.5 w-3.5 ${
+                                  s < review.rating
+                                    ? 'fill-amber-400 text-amber-400'
+                                    : 'text-slate-300 dark:text-slate-600'
+                                }`}
+                              />
+                            ))}
+                            {review.relative_time && (
+                              <span className="ml-2 text-xs text-slate-400">
+                                {review.relative_time}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      {review.text && (
+                        <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                          {review.text}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Location Map */}
             {quiosque.lat && quiosque.lng && (
               <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-slate-800">
