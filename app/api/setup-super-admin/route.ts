@@ -3,13 +3,15 @@ import { createServerClient } from '@supabase/ssr'
 
 export async function POST(request: NextRequest) {
   try {
-    const { key } = await request.json()
+    const { key, email } = await request.json()
 
     if (key !== process.env.SETUP_SUPER_ADMIN_KEY) {
       return NextResponse.json({ error: 'Chave inválida' }, { status: 403 })
     }
 
-    const { email } = await request.json()
+    if (!email) {
+      return NextResponse.json({ error: 'Email obrigatório' }, { status: 400 })
+    }
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
