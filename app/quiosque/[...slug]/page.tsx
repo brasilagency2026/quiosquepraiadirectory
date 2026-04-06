@@ -73,6 +73,21 @@ export default async function QuiosquePage({
     notFound()
   }
 
+  // Auto-refresh Google reviews if stale (older than 7 days) and has a place_id
+  if (quiosque.google_place_id && quiosque.plan === 'premium') {
+    const lastVerified = quiosque.premium_verified_at ? new Date(quiosque.premium_verified_at) : null
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    if (!lastVerified || !quiosque.google_rating || lastVerified < sevenDaysAgo) {
+      // Fire-and-forget background refresh
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://quiosquepraia.com'
+      fetch(`${appUrl}/api/fetch-google-reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quiosqueId: quiosque.id, googlePlaceId: quiosque.google_place_id }),
+      }).catch(() => {})
+    }
+  }
+
   // If the URL doesn't match the canonical SEO-friendly format, redirect
   const canonicalPath = buildQuiosquePath(quiosque.name, quiosque.id, quiosque.state, quiosque.city, quiosque.beach_name)
   const currentPath = `/quiosque/${slug.join('/')}`

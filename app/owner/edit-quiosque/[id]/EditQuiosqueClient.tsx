@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { getProxyImageUrl } from '@/lib/utils'
 import {
-  Waves, Save, ArrowLeft, Upload, X, Loader2, MapPin, Lock,
+  Waves, Save, ArrowLeft, Upload, X, Loader2, MapPin, Lock, Star, RefreshCw,
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -44,6 +44,9 @@ export default function EditQuiosqueClient({ quiosque, isPremium }: Props) {
   const [specialties, setSpecialties] = useState<string[]>(quiosque.specialties || [])
   const [photos, setPhotos] = useState<string[]>(quiosque.photos || [])
   const [googlePlaceId, setGooglePlaceId] = useState(quiosque.google_place_id || '')
+  const [googleRating, setGoogleRating] = useState<number | null>(quiosque.google_rating)
+  const [googleReviewsCount, setGoogleReviewsCount] = useState(quiosque.google_reviews_count || 0)
+  const [fetchingReviews, setFetchingReviews] = useState(false)
 
   // Load Google Maps
   useEffect(() => {
@@ -118,6 +121,33 @@ export default function EditQuiosqueClient({ quiosque, isPremium }: Props) {
     setSpecialties((prev) =>
       prev.includes(specialty) ? prev.filter((s) => s !== specialty) : [...prev, specialty]
     )
+  }
+
+  const handleFetchGoogleReviews = async () => {
+    if (!googlePlaceId) {
+      setError('Selecione um endereço do Google Maps primeiro para obter o Place ID.')
+      return
+    }
+    setFetchingReviews(true)
+    setError('')
+    try {
+      const res = await fetch('/api/fetch-google-reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quiosqueId: quiosque.id, googlePlaceId }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setGoogleRating(data.rating)
+        setGoogleReviewsCount(data.reviewsCount)
+        setSuccess(`Avaliações importadas! Nota: ${data.rating?.toFixed(1) ?? 'N/A'} (${data.reviewsCount} avaliações)`)
+      } else {
+        setError(data.error || 'Erro ao buscar avaliações')
+      }
+    } catch {
+      setError('Erro ao buscar avaliações do Google')
+    }
+    setFetchingReviews(false)
   }
 
   const handleSave = async (e: React.FormEvent) => {
@@ -408,25 +438,57 @@ export default function EditQuiosqueClient({ quiosque, isPremium }: Props) {
                 </div>
               </div>
 
-              {/* Google Place ID */}
+              {/* Google Reviews */}
               <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-slate-800">
                 <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">
                   Avaliações Google
                 </h2>
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Google Place ID
-                  </label>
-                  <input
-                    type="text"
-                    value={googlePlaceId}
-                    onChange={(e) => setGooglePlaceId(e.target.value)}
-                    placeholder="Preenchido automaticamente pelo endereço"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                  />
-                  <p className="mt-1 text-xs text-slate-400">
-                    O Place ID é preenchido automaticamente ao selecionar um endereço do Google Maps.
-                  </p>
+
+                {/* Current rating display */}
+                {googleRating != null && (
+                  <div className="mb-4 flex items-center gap-3 rounded-lg bg-amber-50 p-4 dark:bg-amber-900/20">
+                    <Star className="h-8 w-8 fill-amber-400 text-amber-400" />
+                    <div>
+                      <span className="text-2xl font-bold text-slate-800 dark:text-white">
+                        {googleRating.toFixed(1)}
+                      </span>
+                      <span className="ml-2 text-sm text-slate-500">
+                        ({googleReviewsCount} avaliações no Google)
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Google Place ID
+                    </label>
+                    <input
+                      type="text"
+                      value={googlePlaceId}
+                      onChange={(e) => setGooglePlaceId(e.target.value)}
+                      placeholder="Preenchido automaticamente pelo endereço"
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                    />
+                    <p className="mt-1 text-xs text-slate-400">
+                      O Place ID é preenchido automaticamente ao selecionar um endereço do Google Maps.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleFetchGoogleReviews}
+                    disabled={fetchingReviews || !googlePlaceId}
+                    className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-amber-600 disabled:opacity-50"
+                  >
+                    {fetchingReviews ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <RefreshCw className="h-4 w-4" />
+                    )}
+                    {fetchingReviews ? 'Importando...' : googleRating != null ? 'Atualizar avaliações' : 'Importar avaliações do Google'}
+                  </button>
                 </div>
               </div>
             </>
