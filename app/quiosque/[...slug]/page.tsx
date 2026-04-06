@@ -19,11 +19,12 @@ async function getQuiosque(slugParts: string[]): Promise<Quiosque | null> {
   const lastSegment = slugParts[slugParts.length - 1]
   const shortId = extractIdFromSlug(lastSegment)
 
+  // UUID columns don't support ilike directly — cast to text
   const { data } = await supabase
     .from('quiosques')
     .select('*')
     .eq('status', 'active')
-    .ilike('id', `${shortId}%`)
+    .filter('id::text', 'ilike', `${shortId}%`)
     .single()
 
   return data as Quiosque | null
