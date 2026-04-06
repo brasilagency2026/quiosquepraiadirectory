@@ -13,6 +13,8 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 async function getQuiosque(slugParts: string[]): Promise<Quiosque | null> {
   const supabase = await createClient()
   // The last segment always contains "nome-shortid"
