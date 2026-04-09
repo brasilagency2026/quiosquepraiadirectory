@@ -8,9 +8,9 @@ import type { Quiosque } from '@/types'
 import Link from 'next/link'
 
 // Fix Leaflet default icons
-const defaultIcon = L.icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+const greyIcon = L.icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
+  iconRetinaUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
@@ -18,9 +18,9 @@ const defaultIcon = L.icon({
   shadowSize: [41, 41],
 })
 
-const premiumIcon = L.icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+const redIcon = L.icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+  iconRetinaUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
   iconSize: [30, 48],
   iconAnchor: [15, 48],
@@ -28,7 +28,7 @@ const premiumIcon = L.icon({
   shadowSize: [48, 48],
 })
 
-L.Marker.prototype.options.icon = defaultIcon
+L.Marker.prototype.options.icon = greyIcon
 
 interface QuiosqueMapProps {
   quiosques: Quiosque[]
@@ -90,7 +90,7 @@ export default function QuiosqueMap({
           <Marker
             key={q.id}
             position={[q.lat, q.lng]}
-            icon={isPremium ? premiumIcon : defaultIcon}
+            icon={isPremium ? redIcon : greyIcon}
           >
             <Popup>
               <div className="min-w-[200px]">
