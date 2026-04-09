@@ -240,9 +240,13 @@ export default function InscriptionPage() {
                     <Crown className="h-4 w-4" />
                     Premium
                   </div>
-                  <div className="mt-4">
-                    <span className="text-4xl font-extrabold text-slate-900 dark:text-white">Premium</span>
+                  <div className="mt-4 flex items-baseline gap-1">
+                    <span className="text-4xl font-extrabold text-slate-900 dark:text-white">R$ 200</span>
+                    <span className="text-base text-slate-500">/ mês</span>
                   </div>
+                  <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                    🎁 7 dias grátis para testar!
+                  </p>
                   <p className="mt-2 text-sm text-slate-500">
                     Destaque total com fotos, contato direto e solução integrada.
                   </p>
