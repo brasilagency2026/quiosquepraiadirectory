@@ -54,8 +54,8 @@ export default function SuporteContatoPage() {
                 <MapPin className="h-6 w-6 text-amber-600" />
               </div>
               <div>
-                <h2 className="font-semibold text-slate-900 dark:text-white">Localização</h2>
-                <p className="text-sm text-slate-500">Brasil</p>
+                <h2 className="font-semibold text-slate-900 dark:text-white">CNPJ</h2>
+                <p className="text-sm text-slate-500">64.465.357/0001-28</p>
               </div>
             </div>
           </div>
