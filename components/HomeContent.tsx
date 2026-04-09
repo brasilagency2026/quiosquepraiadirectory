@@ -230,6 +230,34 @@ export default function HomeContent({ quiosques }: HomeContentProps) {
             </button>
           </div>
         )}
+
+        {/* Menu Digital + Pagamento CTA */}
+        <div className="mt-16 overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-600 via-teal-500 to-emerald-500 p-[2px] shadow-xl">
+          <div className="rounded-2xl bg-gradient-to-r from-cyan-600 via-teal-500 to-emerald-500 px-6 py-10 text-center sm:px-12">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+              <svg className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-white sm:text-3xl">
+              Menu Digital + Pagamento
+            </h3>
+            <p className="mx-auto mt-3 max-w-md text-base text-white/90">
+              Ofereça um cardápio digital moderno aos seus clientes com pagamento integrado. Simples, rápido e prático.
+            </p>
+            <a
+              href="https://pay.quiosquepraia.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-base font-bold text-teal-600 shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+            >
+              Descobrir agora
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   )
