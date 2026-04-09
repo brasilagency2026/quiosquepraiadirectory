@@ -18,7 +18,7 @@ export default function SuporteContatoPage() {
               </div>
               <div>
                 <h2 className="font-semibold text-slate-900 dark:text-white">Email</h2>
-                <p className="text-sm text-slate-500">contato@portalquiosques.com.br</p>
+                <p className="text-sm text-slate-500">contato@quiosquepraia.com</p>
               </div>
             </div>
           </div>
