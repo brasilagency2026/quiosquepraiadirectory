@@ -242,9 +242,23 @@ export default function HomeContent({ quiosques }: HomeContentProps) {
             <h3 className="text-2xl font-bold text-white sm:text-3xl">
               Menu Digital + Pagamento
             </h3>
-            <p className="mx-auto mt-3 max-w-md text-base text-white/90">
-              Ofereça um cardápio digital moderno aos seus clientes com pagamento integrado. Simples, rápido e prático.
+            <p className="mx-auto mt-3 max-w-lg text-base text-white/90">
+              Ofereça um cardápio digital moderno aos seus clientes com pagamento integrado via Mercado Pago.
             </p>
+            <div className="mx-auto mt-4 flex flex-wrap items-center justify-center gap-3 text-sm font-medium text-white/95">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 backdrop-blur-sm">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                Sem app para instalar
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 backdrop-blur-sm">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                Sem maquininha
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 backdrop-blur-sm">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                Funciona com Mercado Pago
+              </span>
+            </div>
             <a
               href="https://pay.quiosquepraia.com"
               target="_blank"
