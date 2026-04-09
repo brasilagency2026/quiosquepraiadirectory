@@ -312,7 +312,7 @@ export default function InscriptionPage() {
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 py-3 text-sm font-semibold text-white shadow-md transition hover:from-amber-500 hover:to-orange-600"
                 >
                   <ExternalLink className="h-4 w-4" />
-                  Assinar Premium em pay.quiosquepraia.com
+                  Assinar Premium
                 </a>
 
                 <p className="mt-3 text-center text-xs text-slate-400">
